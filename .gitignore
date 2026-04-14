@@ -1,22 +1,26 @@
-# Environment variables (contain secrets)
+# Environment files (secrets)
 .env
 .env.local
 .env.*.local
 
-# Agent data (should not be synced)
+# OS files
 .DS_Store
-*.log
+Thumbs.db
 
-# Hermes
+# Agent runtime data (should stay local)
+*.log
+logs/
+checkpoints/
+
+# Hermes runtime
 auth.json
 auth.lock
 interrupt_debug.log
-checkpoints/
 
-# OpenClaw
+# OpenClaw runtime
 openclaw.json.bak*
 
-# Claude Code
+# Claude Code runtime
 history.jsonl
 cache/
 file-history/
@@ -32,5 +36,6 @@ telemetry/
 *.swp
 *.swo
 
-# Backup
-*-backup*/
+# SQLite sessions (retained as hermes_state.db)
+# Don't commit full sessions directory
+sessions/

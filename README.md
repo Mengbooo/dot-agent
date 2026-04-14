@@ -1,93 +1,76 @@
 # dot-agents
 
-Claude Code + Hermes + OpenClaw 配置文件同步与管理
+> Claude Code + Hermes + OpenClaw — **Agent 记忆与能力同步**
 
-## 目录结构
+## 核心理念
+
+把 **Agent 的"大脑"** 备份到 GitHub：
+- **Skills**：Agent 学到的能力（工作流、坑点、验证步骤）
+- **Sessions**：历史对话（可搜索的 FTS5 SQLite）
+- **Memory**：用户偏好、环境配置
+
+换机器后，Agent 能继承积累的经验，继续成长。
+
+## 同步内容
 
 ```
 dot-agents/
-├── README.md
-├── .env.template          # 环境变量模板
-├── hermes/
-│   ├── config.yaml        # Hermes 主配置
-│   └── README.md
-├── openclaw/
-│   └── config.json        # OpenClaw 配置
-├── claudecode/
-│   └── settings.json      # Claude Code 设置
-└── scripts/
-    └── bootstrap.sh       # 一键安装脚本
+├── skills/                    # Hermes Skills（全部）
+│   ├── github/               # GitHub 相关技能
+│   ├── mlops/               # ML 训练技能
+│   ├── creative/             # 创意技能
+│   └── ...                   # 其他技能
+│   └── .skills_prompt_snapshot.json  # Skills 索引
+├── sessions/
+│   └── hermes_state.db      # FTS5 SQLite（可搜索历史）
+└── config/                   # 脱敏配置
 ```
 
-## 快速开始
+## Skills 结构
 
-### 1. 克隆此 Repo
+```
+skill-name/
+├── SKILL.md         # 核心文档
+├── references/      # 参考资料
+├── templates/       # 模板文件
+└── scripts/        # 辅助脚本
+```
+
+## Sessions 搜索
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dot-agents.git ~/dot-agents
-cd ~/dot-agents
+# 搜索包含某关键词的历史会话
+sqlite3 sessions/hermes_state.db \
+  "SELECT session_id, substr(content, 1, 100) FROM messages_fts WHERE content MATCH '关键词' LIMIT 10;"
+
+# 查看某会话的所有消息
+sqlite3 sessions/hermes_state.db \
+  "SELECT * FROM messages WHERE session_id = 'abc123';"
 ```
 
-### 2. 配置环境变量
+## 同步命令
 
 ```bash
-cp .env.template .env
-# 编辑 .env 填入你的 API Key
+# 推送到 GitHub
+bash scripts/sync.sh push
+
+# 从 GitHub 拉取
+bash scripts/sync.sh pull
+
+# 查看同步状态
+bash scripts/sync.sh status
 ```
 
-### 3. 一键安装
+## 不同步的内容
 
-```bash
-bash scripts/bootstrap.sh
+| 内容 | 原因 |
+|------|------|
+| API Keys / Tokens | 敏感信息 |
+| history.jsonl | 原始日志 |
+| cache/ | 临时缓存 |
+
+## GitHub Repo
+
 ```
-
-## 各组件说明
-
-### Hermes
-- 通用 AI Agent，大脑角色
-- 配置：`~/.hermes/config.yaml`
-- 支持记忆持久化、Skills 系统、多平台接入
-
-### OpenClaw
-- 消息网关，负责多平台聚合
-- 配置：`~/.openclaw/openclaw.json`
-- 支持 Telegram/飞书/Discord 等
-
-### Claude Code
-- 专注代码生成的 CLI 工具
-- 配置：`~/.claude/settings.json`
-- 与 Hermes 共享 API 端点
-
-## 敏感信息
-
-所有密钥通过环境变量注入，不要将以下文件提交到 Git：
-
-- `.env` (包含真实密钥)
-- `auth.json`
-- `settings.local.json`
-
-## 自定义配置
-
-### 添加新的 Claude Code 项目配置
-
-```bash
-# 查看现有项目
-ls ~/.claude/projects/
-
-# 添加到 claudecode/projects/
+https://github.com/Mengbooo/dot-agent
 ```
-
-### 添加新的 Hermes Skill
-
-```bash
-# 目录结构
-~/.hermes/skills/
-├── SKILL.md
-├── references/
-├── templates/
-└── scripts/
-```
-
-## License
-
-MIT
