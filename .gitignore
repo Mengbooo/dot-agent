@@ -1,0 +1,36 @@
+# Environment variables (contain secrets)
+.env
+.env.local
+.env.*.local
+
+# Agent data (should not be synced)
+.DS_Store
+*.log
+
+# Hermes
+auth.json
+auth.lock
+interrupt_debug.log
+checkpoints/
+
+# OpenClaw
+openclaw.json.bak*
+
+# Claude Code
+history.jsonl
+cache/
+file-history/
+paste-cache/
+session-env/
+sessions/
+shell-snapshots/
+telemetry/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Backup
+*-backup*/
